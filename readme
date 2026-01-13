@@ -1,7 +1,7 @@
 # MNIST Digit Classifier
 
 A PyTorch-based neural network implementation for classifying handwritten digits from the MNIST dataset. This project demonstrates multi-class classification using both custom implementations and PyTorch built-in modules.
-
+Checkout the blog post here: https://medium.com/@tuncgonel/sgd-for-a-multi-class-digit-classifier-da8f12b4a1d9
 ## Project Overview
 
 This project classifies three digits: **1, 3, and 7** using a simple linear neural network. It includes two implementations:
