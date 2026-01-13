@@ -1,0 +1,158 @@
+# MNIST Digit Classifier
+
+A PyTorch-based neural network implementation for classifying handwritten digits from the MNIST dataset. This project demonstrates multi-class classification using both custom implementations and PyTorch built-in modules.
+
+## Project Overview
+
+This project classifies three digits: **1, 3, and 7** using a simple linear neural network. It includes two implementations:
+
+- **Custom implementation**: Hand-built linear model with manual weight management
+- **Optimized implementation**: Using PyTorch's `nn.Linear` module with custom and built-in optimizers
+
+## Features
+
+- **Multi-class Classification**: Distinguishes between digits 1, 3, and 7
+- **Cross-Entropy Loss**: Proper loss function for multi-class problems
+- **Custom Optimizer**: Hand-built `BasicOptim` class demonstrating gradient descent
+- **PyTorch Integration**: Comparison with standard PyTorch `SGD` optimizer
+- **Validation Tracking**: Monitors accuracy across training epochs
+
+## Project Structure
+
+```
+digit-classifier/
+│
+├── main.py                  # Custom linear model implementation
+├── optimized_training.py    # PyTorch nn.Linear implementation
+├── optimizer.py             # Custom BasicOptim class
+├── helpers.py               # Utility functions (loss, accuracy, training)
+└── readme                   # This file
+```
+
+## Key Components
+
+### Data Processing
+
+- **`store_files()`**: Organizes MNIST images by digit
+- **`stack_tensors()`**: Converts images to tensor batches
+- **`generate_dset()`**: Creates labeled dataset with binary labels (0, 1, 2)
+
+### Model Architecture
+
+- **Input**: 28×28 pixel images (flattened to 784 features)
+- **Output**: 3 classes (digits 1, 3, 7)
+- **Activation**: Softmax (applied via cross-entropy loss)
+
+### Training Functions
+
+- **`mnist_loss()`**: Cross-entropy loss for multi-class classification
+- **`calc_grad()`**: Computes gradients via backpropagation
+- **`train_epoch()`**: Trains model for one epoch
+- **`validate_epoch()`**: Evaluates model accuracy on validation set
+
+## How It Works
+
+### Binary Labels for Multi-Class
+
+The digits are mapped to class indices:
+
+- Digit '1' → Label 0
+- Digit '3' → Label 1
+- Digit '7' → Label 2
+
+**Important**: These are _class labels_, not the actual digit values. The model learns to distinguish between three categories, not to recognize the numbers themselves.
+
+### Training Process
+
+1. **Forward Pass**: Compute predictions from input images
+2. **Loss Calculation**: Measure error using cross-entropy
+3. **Backpropagation**: Compute gradients (how to adjust weights)
+4. **Weight Update**: Move weights in direction that reduces loss
+5. **Validation**: Check accuracy on unseen data
+
+## Usage
+
+### Running the Custom Implementation
+
+```bash
+python main.py
+```
+
+### Running the Optimized Implementation
+
+```bash
+python optimized_training.py
+```
+
+This will:
+
+1. Load MNIST dataset
+2. Show initial accuracy (~33% random guessing)
+3. Train for 20 epochs with custom optimizer
+4. Train for 20 more epochs with PyTorch SGD
+5. Display validation accuracy after each epoch
+
+## Requirements
+
+```
+torch
+torchvision
+fastai
+fastbook
+```
+
+Install with:
+
+```bash
+pip install torch torchvision fastai fastbook
+```
+
+## Key Concepts Demonstrated
+
+### Why Binary Labels (0, 1, 2)?
+
+The model uses **softmax + cross-entropy** which expects:
+
+- **Raw logits** (model outputs before activation)
+- **Class indices** as labels (not the digit values)
+
+If you used labels 1, 3, 7, the model wouldn't work because:
+
+- `argmax` would compare indices to actual digit values
+- Loss function expects labels in range [0, num_classes)
+
+### Gradient Flow
+
+```python
+loss.backward()  # Computes gradients for all parameters
+```
+
+This calculates how much each weight contributed to the error, enabling the optimizer to adjust them intelligently.
+
+### Accuracy vs Loss
+
+- **Loss**: Measures how "wrong" the predictions are (used for training)
+- **Accuracy**: Percentage of correct predictions (used for evaluation)
+
+## Performance
+
+- **Baseline (random)**: ~33% accuracy
+- **After training**: Typically 85-95% accuracy
+- **Training time**: ~1-2 minutes for 40 epochs
+
+## Learning Resources
+
+This project demonstrates:
+
+- Multi-class classification architecture
+- Custom vs built-in optimizers
+- Proper loss functions for classification
+- PyTorch tensor operations and autograd
+- Training/validation split methodology
+
+## Future Improvements
+
+- Add hidden layers (deeper network)
+- Implement data augmentation
+- Add learning rate scheduling
+- Visualize misclassified examples
