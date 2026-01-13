@@ -2,6 +2,7 @@ from fastai.vision.all import *
 from fastbook import *
 
 def sigmoid(x): return 1/(1+torch.exp(-x))
+
 #initalize random weights per pixel function
 def init_params(size, std=1.0): return (torch.randn(size)*std).requires_grad_()
 
@@ -16,12 +17,13 @@ def calc_grad(xb, yb, model, weights, bias):
     loss = mnist_loss(preds, yb)
     loss.backward()
 
-def train_epoch_optimizer(model,dl, opt):
-    for xb,yb in dl:
-        calc_grad(xb, yb, model)
-        opt.step()
-        opt.zero_grad()
 
+def train_epoch(model, dl, lr, params):
+    for xb,yb in dl:
+        calc_grad(xb, yb, model, params[0], params[1])
+        for p in params:
+            p.data -= p.grad*lr
+            p.grad.zero_()
 
 def batch_accuracy(preds, yb):
     probs = preds.softmax(dim=1)

@@ -1,4 +1,6 @@
-from helpers import calc_grad
+from helpers import batch_accuracy, mnist_loss
+from fastai.vision.all import *
+from fastbook import *
 
 class BasicOptim:
     def __init__(self,params,lr): 
@@ -11,9 +13,15 @@ class BasicOptim:
         for p in self.params: p.grad = None
 
 
-def train_epoch(model, dl, lr, params):
+def train_epoch_optimizer(model, dl, opt):
     for xb,yb in dl:
-        calc_grad(xb, yb, model, params[0], params[1])
-        for p in params:
-            p.data -= p.grad*lr
-            p.grad.zero_()
+        preds = model(xb)
+        loss = mnist_loss(preds, yb)
+        loss.backward()
+        opt.step()
+        opt.zero_grad()
+
+
+def validate_epoch_optimizer(model, valid_dl):
+    accs = [batch_accuracy(model(xb), yb) for xb,yb in valid_dl]
+    return round(torch.stack(accs).mean().item(), 4)

@@ -4,7 +4,6 @@ from helpers import *
 import torch.nn.functional as F
 
 def store_files(files, path, digits):
-    
     files_by_digit = {}
     for d in digits:
         files_by_digit[d] = (path/files/d).ls().sorted()
@@ -23,10 +22,6 @@ def stack_tensors(image_files):
 
 def generate_dset(stacked_img_tensors, files_by_digit, digits):
     train_x = torch.cat(stacked_img_tensors).view(-1, 28*28)
-    # train_y = tensor([0]*len(files_by_digit['1']) + 
-    #             [1]*len(files_by_digit['3']) + 
-    #             [2]*len(files_by_digit['7'])).unsqueeze(1)
-    
     train_y = tensor(sum([[i]*len(files_by_digit[digits[i]]) for i in range(len(digits))], [])).unsqueeze(1)
     dset = list(zip(train_x,train_y))
     return dset
@@ -53,64 +48,13 @@ def main():
 
     bias = init_params(3)
 
-
     dl = DataLoader(dset, batch_size=256)
-    # xb,yb = first(dl)
     valid_dl = DataLoader(valid_dset, batch_size=256)
-
-    train_x = torch.cat(stacked_img_tensors).view(-1, 28*28)
-
-    train_y = tensor([0]*len(files_by_digit['1']) + 
-                    [1]*len(files_by_digit['3']) + 
-                    [2]*len(files_by_digit['7'])).unsqueeze(1)
-
-    batch = train_x[:4]
-    preds = linear1(batch, weights, bias)
-    # loss = mnist_loss(preds, train_y[:4])
-    # loss.backward()
-    print(validate_epoch(linear1, weights, bias, valid_dl))
     lr = 0.1
-    train_epoch(linear1, dl, lr, [weights, bias])
-    print(validate_epoch(linear1, weights, bias, valid_dl))
+    
     for i in range(20):
         train_epoch(linear1, dl, lr, [weights, bias])
         print(validate_epoch(linear1, weights, bias, valid_dl), end=' ')
 
-
-# preds = linear1(train_x, weights, bias)
-# probs = preds.softmax(dim=1)
-# predicted_class = probs.argmax(dim=1)
-# corrects = (predicted_class.unsqueeze(1) == train_y)
-# print(corrects.float().mean().item())
-
-
 if __name__ == "__main__":
     main()
-
-
-# dl = DataLoader(dset, batch_size=256)
-# xb,yb = first(dl)
-# valid_dl = DataLoader(valid_dset, batch_size=256)
-
-# train_x = torch.cat(stacked_img_tensors).view(-1, 28*28)
-# # train_y = tensor(
-# #     sum(([int(d)] * len(files_by_digit[d]) for d in digits), [])
-# # ).unsqueeze(1)
-
-# train_y =  tensor([1]*len(files_by_digit['3']) + [0]*len(files_by_digit['7'])).unsqueeze(1)
-# print(train_x.shape,train_y.shape)
-# print((train_x[0]*weights.T).sum() + bias)
-
-
-# preds = linear1(train_x, weights, bias)
-# print(preds)
-
-# corrects = (preds>0.0).float() == train_y
-# print(corrects)
-
-# print(corrects.float().mean().item())
-# # batch = train_x[:4]
-# # batch.shape
-
-# # calc_grad(batch, train_y[:4], linear1, weights, bias)
-# # print(validate_epoch(linear1, weights, bias, valid_dl))
